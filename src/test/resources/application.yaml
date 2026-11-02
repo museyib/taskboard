@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:taskboard;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secretKey: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    accessTokenExpiration: 3600000
+    refreshTokenExpiration: 604800000

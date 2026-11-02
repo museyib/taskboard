@@ -1,0 +1,7 @@
+package llc.devlab.app.exception;
+
+public class TaskBlockedException extends RuntimeException {
+    public TaskBlockedException(String message) {
+        super(message);
+    }
+}
