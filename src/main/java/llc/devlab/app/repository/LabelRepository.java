@@ -10,4 +10,6 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
     List<Label> findAllByDeletedFalse();
 
     Optional<Label> findByIdAndDeletedFalse(Long id);
+
+    Label findByName(String name);
 }

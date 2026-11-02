@@ -1,5 +1,7 @@
 package llc.devlab.app.service;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import llc.devlab.app.exception.ResourceNotFoundException;
 import llc.devlab.app.exception.TaskBlockedException;
@@ -7,15 +9,21 @@ import llc.devlab.app.mapper.CsvFileMapper;
 import llc.devlab.app.mapper.LabelMapper;
 import llc.devlab.app.mapper.TaskMapper;
 import llc.devlab.app.model.dto.*;
+import llc.devlab.app.model.entity.Label;
 import llc.devlab.app.model.entity.Task;
 import llc.devlab.app.model.enums.TaskStatus;
 import llc.devlab.app.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +34,14 @@ public class TaskService {
     private final LabelMapper labelMapper;
     private final CsvFileMapper csvFileMapper;
 
-    public List<TaskDto> getUserTasks(String authenticatedEmail) {
-        return taskMapper.toDtoList(taskRepository.findAllByCreatedByAndDeletedFalse(authenticatedEmail));
+    public List<TaskDto> getUserTasksFiltered(String authenticatedEmail,
+                                              Map<String, String> allParams,
+                                              int page,
+                                              int size,
+                                              String sort) {
+        Specification<Task> specification = buildQueryFilter(authenticatedEmail, allParams);
+
+        return taskMapper.toDtoList(taskRepository.findAll(specification, PageRequest.of(page, size, sort(sort))).getContent());
     }
 
     public TaskResponse getUserTaskById(Long id, String authenticatedEmail) {
@@ -50,7 +64,7 @@ public class TaskService {
         Task task = taskRepository.findByIdAndCreatedByAndDeletedFalse(id, authenticatedEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
-        if (request.status().equals(TaskStatus.BLOCKED)) {
+        if (TaskStatus.BLOCKED.equals(request.status())) {
             throw new TaskBlockedException("Cannot update task status to BLOCKED");
         }
 
@@ -73,5 +87,55 @@ public class TaskService {
     public byte[] exportCompletedTasks(String authenticatedEmail) {
         List<Task> completedTasks = taskRepository.findByCreatedByAndStatusAndDeletedFalse(authenticatedEmail, TaskStatus.DONE);
         return csvFileMapper.toCsv(completedTasks);
+    }
+
+    private Specification<Task> buildQueryFilter(String email, Map<String, String> params) {
+
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(criteriaBuilder.equal(root.get("createdBy"), email));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+
+            if (params.containsKey("status") && !params.get("status").isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), params.get("status")));
+            }
+
+            if (params.containsKey("deadLine") && !params.get("deadLine").isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("deadLine"), params.get("deadLine")));
+            }
+
+            if (params.containsKey("keyword") && !params.get("keyword").isEmpty()) {
+                String pattern = "%" + params.get("keyword") + "%";
+                Predicate nameLike = criteriaBuilder.like(root.get("name"), pattern);
+                Predicate descriptionLike = criteriaBuilder.like(root.get("description"), pattern);
+
+                Predicate keywordMatch = criteriaBuilder.or(nameLike, descriptionLike);
+
+                predicates.add(keywordMatch);
+            }
+
+            if (params.containsKey("label") && !params.get("label").isEmpty()) {
+                Join<Task, Label> labelJoin = root.join("labels");
+                predicates.add(criteriaBuilder.equal(labelJoin.get("name"), params.get("label")));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    private Sort sort(String sort) {
+        Sort.Direction direction = Sort.Direction.DESC;
+        String sortKey = "deadLine";
+        if (sort != null && !sort.isEmpty()) {
+            if (sort.contains(",")) {
+                String[] sortParts = sort.split(",");
+                sortKey = sortParts[0];
+                direction = sortParts[1].equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+            } else {
+                sortKey = sort;
+            }
+        }
+        return Sort.by(direction, sortKey);
     }
 }
