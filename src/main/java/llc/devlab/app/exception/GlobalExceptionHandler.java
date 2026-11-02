@@ -2,6 +2,7 @@ package llc.devlab.app.exception;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -46,6 +47,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<ErrorResponse> handleException(DateTimeParseException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), ex);
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handleException(PropertyReferenceException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), ex);
     }
 
