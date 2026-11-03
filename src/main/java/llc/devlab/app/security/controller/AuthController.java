@@ -21,7 +21,8 @@ public class AuthController {
 
     @Operation(
             description = "Register a new user",
-            summary = "Register a new user"
+            summary = "Register a new user",
+            tags = {"Authentication"}
     )
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@Valid @RequestBody RegisterRequest request) {
@@ -31,7 +32,8 @@ public class AuthController {
 
     @Operation(
             description = "Authenticate a user",
-            summary = "Authenticate a user"
+            summary = "Authenticate a user",
+            tags = {"Authentication"}
     )
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -41,7 +43,8 @@ public class AuthController {
 
     @Operation(
             description = "Refresh a user's access token",
-            summary = "Refresh a user's access token"
+            summary = "Refresh a user's access token",
+            tags = {"Authentication"}
     )
     @PostMapping("/refresh")
     public ResponseEntity<RefreshTokenResponse> refresh(@Valid @RequestBody TokenRequest request) {
@@ -51,7 +54,8 @@ public class AuthController {
 
     @Operation(
             description = "Logout a user",
-            summary = "Logout a user"
+            summary = "Logout a user",
+            tags = {"Authentication"}
     )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Valid @RequestBody TokenRequest request) {

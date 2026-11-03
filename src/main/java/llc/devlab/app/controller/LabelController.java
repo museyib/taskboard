@@ -20,8 +20,10 @@ public class LabelController {
 
     @Operation(
             description = "Get labels",
-            summary = "Get labels"
-    )    @GetMapping
+            summary = "Get labels",
+            tags = {"Label"}
+    )
+    @GetMapping
     public ResponseEntity<List<LabelDto>> getLabels() {
         return ResponseEntity.ok(labelService.getLabels());
     }
@@ -29,8 +31,10 @@ public class LabelController {
 
     @Operation(
             description = "Get label by id",
-            summary = "Get label by id"
-    )    @GetMapping("/{id}")
+            summary = "Get label by id",
+            tags = {"Label"}
+    )
+    @GetMapping("/{id}")
     public ResponseEntity<LabelDto> getLabelById(@PathVariable Long id) {
         return ResponseEntity.ok(labelService.getLabelById(id));
     }
@@ -38,8 +42,10 @@ public class LabelController {
 
     @Operation(
             description = "Create label",
-            summary = "Create label"
-    )    @PostMapping
+            summary = "Create label",
+            tags = {"Label"}
+    )
+    @PostMapping
     public ResponseEntity<LabelDto> createLabel(@Valid @RequestBody LabelCreateRequest request) {
         return ResponseEntity.ok(labelService.createLabel(request));
     }
@@ -47,8 +53,10 @@ public class LabelController {
 
     @Operation(
             description = "Update label",
-            summary = "Update label"
-    )    @PutMapping("/{id}")
+            summary = "Update label",
+            tags = {"Label"}
+    )
+    @PatchMapping("/{id}")
     public ResponseEntity<LabelDto> updateLabel(@PathVariable Long id,
                                                  @RequestBody LabelUpdateRequest request) {
         return ResponseEntity.ok(labelService.updateLabel(id, request));
@@ -57,8 +65,10 @@ public class LabelController {
 
     @Operation(
             description = "Delete label",
-            summary = "Delete label"
-    )    @DeleteMapping("/{id}")
+            summary = "Delete label",
+            tags = {"Label"}
+    )
+    @DeleteMapping("/{id}")
     public void deleteLabel(@PathVariable Long id) {
         labelService.deleteLabel(id);
     }

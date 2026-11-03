@@ -21,7 +21,8 @@ public class TaskController {
 
     @Operation(
             description = "Get user tasks",
-            summary = "Get user tasks"
+            summary = "Get user tasks",
+            tags = {"Task"}
     )
     @GetMapping
     public ResponseEntity<List<TaskDto>> getUserTasks(@AuthenticationPrincipal UserDetails userDetails,
@@ -34,7 +35,8 @@ public class TaskController {
 
     @Operation(
             description = "Get task by id",
-            summary = "Get task by id"
+            summary = "Get task by id",
+            tags = {"Task"}
     )
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getUserTaskById(@PathVariable Long id,
@@ -44,7 +46,8 @@ public class TaskController {
 
     @Operation(
             description = "Create task",
-            summary = "Create task"
+            summary = "Create task",
+            tags = {"Task"}
     )
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@Valid @RequestBody TaskCreateRequest request) {
@@ -53,9 +56,10 @@ public class TaskController {
 
     @Operation(
             description = "Update task",
-            summary = "Update task"
+            summary = "Update task",
+            tags = {"Task"}
     )
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable Long id,
                                               @RequestBody TaskUpdateRequest request,
                                               @AuthenticationPrincipal UserDetails userDetails) {
@@ -64,7 +68,8 @@ public class TaskController {
 
     @Operation(
             description = "Delete task",
-            summary = "Delete task"
+            summary = "Delete task",
+            tags = {"Task"}
     )
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id,
@@ -74,7 +79,8 @@ public class TaskController {
 
     @Operation(
             description = "Export completed tasks",
-            summary = "Export completed tasks"
+            summary = "Export completed tasks",
+            tags = {"Task"}
     )
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportCompletedTasks(@AuthenticationPrincipal UserDetails userDetails) {
