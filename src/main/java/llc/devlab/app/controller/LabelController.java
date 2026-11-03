@@ -7,6 +7,7 @@ import llc.devlab.app.model.dto.LabelDto;
 import llc.devlab.app.model.dto.LabelUpdateRequest;
 import llc.devlab.app.service.LabelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,7 +48,7 @@ public class LabelController {
     )
     @PostMapping
     public ResponseEntity<LabelDto> createLabel(@Valid @RequestBody LabelCreateRequest request) {
-        return ResponseEntity.ok(labelService.createLabel(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(labelService.createLabel(request));
     }
 
 

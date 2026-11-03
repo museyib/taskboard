@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import llc.devlab.app.model.dto.*;
 import llc.devlab.app.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,7 +52,7 @@ public class TaskController {
     )
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@Valid @RequestBody TaskCreateRequest request) {
-        return ResponseEntity.ok(taskService.createTask(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(request));
     }
 
     @Operation(
