@@ -1,7 +1,9 @@
 package llc.devlab.app.mapper;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import llc.devlab.app.exception.ResourceNotFoundException;
 import llc.devlab.app.model.dto.TaskCreateRequest;
 import llc.devlab.app.model.dto.TaskDto;
 import llc.devlab.app.model.dto.TaskUpdateRequest;
@@ -35,7 +37,15 @@ public abstract class TaskMapper {
             return null;
         }
         return labels.stream()
-                .map(labelId -> entityManager.getReference(Label.class, labelId))
+                .map(labelId -> {
+                    Label label = entityManager.getReference(Label.class, labelId);
+                    try {
+                        label.getName();
+                    } catch (EntityNotFoundException ex) {
+                        throw new ResourceNotFoundException("Label with id " + labelId + " not found");
+                    }
+                    return label;
+                })
                 .collect(Collectors.toList());
     }
 }

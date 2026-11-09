@@ -11,7 +11,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,7 +25,7 @@ public class TaskController {
             tags = {"Task"}
     )
     @GetMapping
-    public ResponseEntity<List<TaskDto>> getUserTasks(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<PageResponse<TaskDto>> getUserTasks(@AuthenticationPrincipal UserDetails userDetails,
                                                       @RequestParam(required = false) Map<String, String> allParams,
                                                       @RequestParam int page,
                                                       @RequestParam int size,

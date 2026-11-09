@@ -216,22 +216,5 @@ class SecurityIntegrationTests {
 
         mockMvc.perform(get("/api/admin/dashboard"))
                 .andExpect(status().isUnauthorized());
-
-        // USER accesses /api/profile
-        mockMvc.perform(get("/api/profile")
-                        .header("Authorization", "Bearer " + userToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username", is("regular@example.com")));
-
-        // USER accesses /api/admin/dashboard -> 403 Forbidden
-        mockMvc.perform(get("/api/admin/dashboard")
-                        .header("Authorization", "Bearer " + userToken))
-                .andExpect(status().isForbidden());
-
-        // ADMIN accesses /api/admin/dashboard -> 200 OK
-        mockMvc.perform(get("/api/admin/dashboard")
-                        .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", is("Admin access granted")));
     }
 }

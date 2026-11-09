@@ -15,15 +15,18 @@ import llc.devlab.app.model.enums.TaskStatus;
 import llc.devlab.app.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,14 +37,18 @@ public class TaskService {
     private final LabelMapper labelMapper;
     private final CsvFileMapper csvFileMapper;
 
-    public List<TaskDto> getUserTasksFiltered(String authenticatedEmail,
+    public PageResponse<TaskDto> getUserTasksFiltered(String authenticatedEmail,
                                               Map<String, String> allParams,
                                               int page,
                                               int size,
                                               String sort) {
         Specification<Task> specification = buildQueryFilter(authenticatedEmail, allParams);
 
-        return taskMapper.toDtoList(taskRepository.findAll(specification, PageRequest.of(page, size, sort(sort))).getContent());
+        Page<Task> tasks = taskRepository.findAll(specification, PageRequest.of(page, size, sort(sort)));
+
+        List<TaskDto> content = tasks.getContent().stream().map(taskMapper::toDto).collect(Collectors.toList());
+
+        return PageResponse.of(content, tasks);
     }
 
     public TaskResponse getUserTaskById(Long id, String authenticatedEmail) {
@@ -102,7 +109,8 @@ public class TaskService {
             }
 
             if (params.containsKey("deadLine") && !params.get("deadLine").isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("deadLine"), params.get("deadLine")));
+                LocalDate deadLine = LocalDate.parse(params.get("deadLine"));
+                predicates.add(criteriaBuilder.equal(root.get("deadLine"), deadLine));
             }
 
             if (params.containsKey("keyword") && !params.get("keyword").isEmpty()) {

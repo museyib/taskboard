@@ -24,11 +24,6 @@ public class TokenService {
         return jwtUtil.generateAccessToken(username);
     }
 
-    public TokenInfo generateAccessTokenFromRefreshToken(String refreshToken) {
-        String username = jwtUtil.extractUsername(refreshToken);
-        return jwtUtil.generateAccessToken(username);
-    }
-
     @Transactional
     public TokenInfo generateRefreshToken(String username) {
         TokenInfo tokenInfo = jwtUtil.generateRefreshToken(username);

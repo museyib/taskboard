@@ -24,6 +24,7 @@ public class JwtUtil {
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(new Date(expiration))
+                .claim("type", "access")
                 .signWith(Keys.hmacShaKeyFor(tokenProperties.getSecretKey().getBytes()))
                 .compact();
         return new TokenInfo(token, expiration);
@@ -36,6 +37,7 @@ public class JwtUtil {
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(new Date(expiration))
+                .claim("type", "refresh")
                 .signWith(Keys.hmacShaKeyFor(tokenProperties.getSecretKey().getBytes()))
                 .compact();
         return new TokenInfo(token, expiration);
@@ -51,5 +53,13 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    public String extractType(String token) {
+        return extractAllClaims(token).get("type", String.class);
+    }
+
+    public boolean isAccessToken(String token) {
+        return "access".equals(extractType(token));
     }
 }
